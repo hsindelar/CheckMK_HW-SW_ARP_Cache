@@ -15,7 +15,7 @@ This plugin collects ARP (Address Resolution Protocol) cache data from network d
 ## Features
 
 - **Automatic Detection**: Automatically detects devices with SNMP ARP table support
-- **Flexible MAC Parsing**: Handles various MAC address formats (especially UniFi's space-separated hex format)
+- **Flexible MAC Parsing**: Handles various MAC address formats
 - **Summary Statistics**: Shows total, dynamic, static, and other entry counts
 - **Detailed Table**: Displays individual ARP entries with full details
 - **Web Interface**: Integrated with CheckMK's web inventory display
@@ -65,21 +65,29 @@ This plugin collects ARP (Address Resolution Protocol) cache data from network d
    omd restart apache  # Restart web interface
    ```
 
-### Docker Installation (as used in development)
+### Kubernetes/Helm Chart Installation
 
 ```bash
-# Copy files to container
-docker cp inv_arp_table.py [CONTAINER_ID]:/tmp/
-docker cp inv_arp_table_rules.py [CONTAINER_ID]:/tmp/
-docker cp inv_arp_table_views.py [CONTAINER_ID]:/tmp/
+# Copy files to CheckMK pod
+kubectl cp inv_arp_table.py [POD_NAME]:/tmp/inv_arp_table.py -c [CONTAINER_NAME]
+kubectl cp inv_arp_table_rules.py [POD_NAME]:/tmp/inv_arp_table_rules.py -c [CONTAINER_NAME]
+kubectl cp inv_arp_table_views.py [POD_NAME]:/tmp/inv_arp_table_views.py -c [CONTAINER_NAME]
 
-# Install inside container
-docker exec -it [CONTAINER_ID] su - cmk -c "cp /tmp/inv_arp_table.py local/lib/python3/cmk_addons/plugins/inventory/agent_based/"
-docker exec -it [CONTAINER_ID] su - cmk -c "cp /tmp/inv_arp_table_rules.py local/lib/python3/cmk_addons/plugins/inventory/rulesets/"
-docker exec -it [CONTAINER_ID] su - cmk -c "cp /tmp/inv_arp_table_views.py local/share/check_mk/web/plugins/views/"
+# Install inside pod
+kubectl exec [POD_NAME] -c [CONTAINER_NAME] -- su - [SITE] -c "cp /tmp/inv_arp_table.py local/lib/python3/cmk_addons/plugins/inventory/agent_based/"
+kubectl exec [POD_NAME] -c [CONTAINER_NAME] -- su - [SITE] -c "cp /tmp/inv_arp_table_rules.py local/lib/python3/cmk_addons/plugins/inventory/rulesets/"
+kubectl exec [POD_NAME] -c [CONTAINER_NAME] -- su - [SITE] -c "cp /tmp/inv_arp_table_views.py local/share/check_mk/web/plugins/views/"
 
 # Restart services
-docker exec -it [CONTAINER_ID] su - cmk -c "cmk -R && omd restart apache"
+kubectl exec [POD_NAME] -c [CONTAINER_NAME] -- bash -c "su - [SITE] -c 'source .profile && cmk -R && omd restart apache'"
+```
+
+**Example for production deployment:**
+```bash
+# Example with actual pod name and container
+kubectl cp inv_arp_table.py monitor-quext-checkmk-checkmk-784c588b9b-lsc5l:/tmp/inv_arp_table.py -c quext
+kubectl exec monitor-quext-checkmk-checkmk-784c588b9b-lsc5l -c quext -- bash -c "su - quext -c 'source .profile && cp /tmp/inv_arp_table.py local/lib/python3/cmk_addons/plugins/inventory/agent_based/'"
+# ... repeat for other files ...
 ```
 
 ## Usage
