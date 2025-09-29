@@ -82,14 +82,6 @@ kubectl exec [POD_NAME] -c [CONTAINER_NAME] -- su - [SITE] -c "cp /tmp/inv_arp_t
 kubectl exec [POD_NAME] -c [CONTAINER_NAME] -- bash -c "su - [SITE] -c 'source .profile && cmk -R && omd restart apache'"
 ```
 
-**Example for production deployment:**
-```bash
-# Example with actual pod name and container
-kubectl cp inv_arp_table.py monitor-quext-checkmk-checkmk-784c588b9b-lsc5l:/tmp/inv_arp_table.py -c quext
-kubectl exec monitor-quext-checkmk-checkmk-784c588b9b-lsc5l -c quext -- bash -c "su - quext -c 'source .profile && cp /tmp/inv_arp_table.py local/lib/python3/cmk_addons/plugins/inventory/agent_based/'"
-# ... repeat for other files ...
-```
-
 ## Usage
 
 1. **Automatic Discovery**: The plugin automatically detects devices with ARP tables
